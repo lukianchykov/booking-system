@@ -3,6 +3,7 @@ package com.lukianchykov.bookingsystem.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.lukianchykov.bookingsystem.domain.AccommodationType;
 import com.lukianchykov.bookingsystem.domain.Unit;
 
 import org.springframework.data.domain.Page;
@@ -26,7 +27,7 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
            "NOT (b.endDate < :startDate OR b.startDate > :endDate)))")
     Page<Unit> findAvailableUnits(
             @Param("numberOfRooms") Integer numberOfRooms,
-            @Param("accommodationType") String accommodationType,
+            @Param("accommodationType") AccommodationType accommodationType,
             @Param("floor") Integer floor,
             @Param("minCost") BigDecimal minCost,
             @Param("maxCost") BigDecimal maxCost,
