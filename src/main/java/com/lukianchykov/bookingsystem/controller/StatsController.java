@@ -1,5 +1,7 @@
 package com.lukianchykov.bookingsystem.controller;
 
+import java.util.Map;
+
 import com.lukianchykov.bookingsystem.dto.AvailabilityStatsResponse;
 import com.lukianchykov.bookingsystem.service.CacheService;
 import com.lukianchykov.bookingsystem.service.UnitService;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,5 +42,29 @@ public class StatsController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/available-units")
+    @Operation(summary = "Get number of available units for booking (cached)")
+    public ResponseEntity<Long> getAvailableUnitsCount() {
+        Long count = cacheService.getAvailableUnitsCount();
+        return ResponseEntity.ok(count);
+    }
+
+    @PostMapping("/refresh-cache")
+    @Operation(summary = "Manually refresh the available units cache")
+    public ResponseEntity<Long> refreshCache() {
+        Long count = cacheService.refreshAvailableUnitsCount();
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/cache-health")
+    @Operation(summary = "Check cache health status")
+    public ResponseEntity<Map<String, Object>> getCacheHealth() {
+        boolean isHealthy = cacheService.isCacheHealthy();
+        return ResponseEntity.ok(Map.of(
+            "healthy", isHealthy,
+            "status", isHealthy ? "UP" : "DOWN"
+        ));
     }
 }

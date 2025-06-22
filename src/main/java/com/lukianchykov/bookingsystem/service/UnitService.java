@@ -10,9 +10,12 @@ import com.lukianchykov.bookingsystem.dto.UnitSearchRequest;
 import com.lukianchykov.bookingsystem.mapper.UnitMapper;
 import com.lukianchykov.bookingsystem.repository.UnitRepository;
 import com.lukianchykov.bookingsystem.repository.UserRepository;
+import com.lukianchykov.bookingsystem.utils.AvailableUnitsChangedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,13 +25,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UnitService {
     
     private final UnitRepository unitRepository;
     private final UserRepository userRepository;
-    private final CacheService cacheService;
     private final EventService eventService;
     private final UnitMapper unitMapper;
+    private final ApplicationEventPublisher eventPublisher;
     
     public UnitResponse createUnit(UnitCreateRequest request) {
         User owner = userRepository.findById(request.getOwnerId())
@@ -47,8 +51,8 @@ public class UnitService {
 
         eventService.createEvent("UNIT_CREATED", "Unit", unit.getId(),
             "Unit created with " + unit.getNumberOfRooms() + " rooms");
-        
-        cacheService.evictAvailableUnitsCache();
+
+        publishAvailableUnitsChangedEvent();
         
         return unitMapper.toResponse(unit);
     }
@@ -82,5 +86,10 @@ public class UnitService {
     
     public Long countAvailableUnitsFromDatabase() {
         return unitRepository.countAvailableUnits();
+    }
+
+    private void publishAvailableUnitsChangedEvent() {
+        log.debug("Publishing available units changed event: {}", "Unit created");
+        eventPublisher.publishEvent(new AvailableUnitsChangedEvent(this));
     }
 }

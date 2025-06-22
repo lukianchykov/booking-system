@@ -22,6 +22,7 @@ import com.lukianchykov.bookingsystem.repository.UserRepository;
 import com.lukianchykov.bookingsystem.utils.AvailableUnitsChangedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BookingService {
 
     private final BookingRepository bookingRepository;
@@ -74,7 +76,7 @@ public class BookingService {
         eventService.createEvent("BOOKING_CREATED", "Booking", booking.getId(),
             "Booking created for unit " + unit.getId());
 
-        eventPublisher.publishEvent(new AvailableUnitsChangedEvent(this));
+        publishAvailableUnitsChangedEvent("Booking created");
 
         return bookingMapper.toResponse(booking);
     }
@@ -93,7 +95,7 @@ public class BookingService {
         eventService.createEvent("BOOKING_CANCELLED", "Booking", booking.getId(),
             "Booking cancelled");
 
-        eventPublisher.publishEvent(new AvailableUnitsChangedEvent(this));
+        publishAvailableUnitsChangedEvent("Booking cancelled");
 
         return bookingMapper.toResponse(booking);
     }
@@ -102,5 +104,10 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Booking not found"));
         return bookingMapper.toResponse(booking);
+    }
+
+    private void publishAvailableUnitsChangedEvent(String reason) {
+        log.debug("Publishing available units changed event from BookingService: {}", reason);
+        eventPublisher.publishEvent(new AvailableUnitsChangedEvent(this));
     }
 }
