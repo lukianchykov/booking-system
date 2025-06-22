@@ -56,3 +56,4 @@ logging:
     org.springframework.cache: DEBUG
     com.lukianchykov.bookingsystem.service.CacheService: DEBUG
     com.lukianchykov.bookingsystem.service.UnitService: DEBUG
+    com.lukianchykov.bookingsystem.service.PaymentService: DEBUG

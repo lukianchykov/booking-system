@@ -11,6 +11,7 @@ import com.lukianchykov.bookingsystem.repository.BookingRepository;
 import com.lukianchykov.bookingsystem.repository.PaymentRepository;
 import com.lukianchykov.bookingsystem.utils.AvailableUnitsChangedEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -52,6 +54,11 @@ public class PaymentService {
         eventService.createEvent("PAYMENT_PROCESSED", "Payment", payment.getId(),
             "Payment processed for booking " + booking.getId());
 
+        publishAvailableUnitsChangedEvent();
+    }
+
+    private void publishAvailableUnitsChangedEvent() {
+        log.debug("Publishing available units changed event: {}", "Payment created");
         eventPublisher.publishEvent(new AvailableUnitsChangedEvent(this));
     }
 }

@@ -29,7 +29,7 @@ public class StatsController {
     @Operation(summary = "Get availability statistics")
     public ResponseEntity<AvailabilityStatsResponse> getAvailabilityStats() {
         Long availableUnits = cacheService.getAvailableUnitsCount();
-        Long totalUnits = unitService.countAvailableUnitsFromDatabase();
+        Long totalUnits = unitService.countTotalUnits();
 
         AvailabilityStatsResponse response = new AvailabilityStatsResponse();
         response.setAvailableUnits(availableUnits);

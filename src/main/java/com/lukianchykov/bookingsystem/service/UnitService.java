@@ -7,6 +7,7 @@ import com.lukianchykov.bookingsystem.domain.User;
 import com.lukianchykov.bookingsystem.dto.UnitCreateRequest;
 import com.lukianchykov.bookingsystem.dto.UnitResponse;
 import com.lukianchykov.bookingsystem.dto.UnitSearchRequest;
+import com.lukianchykov.bookingsystem.dto.UnitUpdateRequest;
 import com.lukianchykov.bookingsystem.mapper.UnitMapper;
 import com.lukianchykov.bookingsystem.repository.UnitRepository;
 import com.lukianchykov.bookingsystem.repository.UserRepository;
@@ -52,8 +53,14 @@ public class UnitService {
         eventService.createEvent("UNIT_CREATED", "Unit", unit.getId(),
             "Unit created with " + unit.getNumberOfRooms() + " rooms");
 
-        publishAvailableUnitsChangedEvent();
+        publishAvailableUnitsChangedEvent("Unit created");
         
+        return unitMapper.toResponse(unit);
+    }
+
+    public UnitResponse getUnit(Long id) {
+        Unit unit = unitRepository.findById(id)
+            .orElseThrow(() -> new UnitNotFoundException(id));
         return unitMapper.toResponse(unit);
     }
 
@@ -78,18 +85,55 @@ public class UnitService {
         return units.map(unitMapper::toResponse);
     }
 
-    public UnitResponse getUnit(Long id) {
+    public UnitResponse updateUnit(Long id, UnitUpdateRequest request) {
         Unit unit = unitRepository.findById(id)
             .orElseThrow(() -> new UnitNotFoundException(id));
+
+        User owner = userRepository.findById(request.getOwnerId())
+            .orElseThrow(() -> new UserNotFoundException(request.getOwnerId()));
+
+        unit.setNumberOfRooms(request.getNumberOfRooms());
+        unit.setAccommodationType(request.getAccommodationType());
+        unit.setFloor(request.getFloor());
+        unit.setBaseCost(request.getBaseCost());
+        unit.setFinalCost(request.getFinalCost());
+        unit.setDescription(request.getDescription());
+        unit.setOwner(owner);
+
+        unit = unitRepository.save(unit);
+
+        eventService.createEvent("UNIT_UPDATED", "Unit", unit.getId(),
+            "Unit updated");
+
+        publishAvailableUnitsChangedEvent("Unit updated");
+
         return unitMapper.toResponse(unit);
     }
-    
+
+    public void deleteUnit(Long id) {
+        Unit unit = unitRepository.findById(id)
+            .orElseThrow(() -> new UnitNotFoundException(id));
+
+        unitRepository.delete(unit);
+
+        eventService.createEvent("UNIT_DELETED", "Unit", id,
+            "Unit deleted");
+
+        publishAvailableUnitsChangedEvent("Unit deleted");
+    }
+
     public Long countAvailableUnitsFromDatabase() {
+        log.debug("Querying database for available units count");
         return unitRepository.countAvailableUnits();
     }
 
-    private void publishAvailableUnitsChangedEvent() {
-        log.debug("Publishing available units changed event: {}", "Unit created");
+    public Long countTotalUnits() {
+        log.debug("Querying database for total units count");
+        return unitRepository.count();
+    }
+
+    private void publishAvailableUnitsChangedEvent(String reason) {
+        log.debug("Publishing available units changed event: {}", reason);
         eventPublisher.publishEvent(new AvailableUnitsChangedEvent(this));
     }
 }
