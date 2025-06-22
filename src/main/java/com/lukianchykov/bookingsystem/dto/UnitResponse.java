@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lukianchykov.bookingsystem.domain.AccommodationType;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,9 +28,11 @@ public class UnitResponse {
     private Integer floor;
 
     @JsonProperty("base_cost")
+    @NotNull
     private BigDecimal baseCost;
 
     @JsonProperty("final_cost")
+    @NotNull
     private BigDecimal finalCost;
 
     private String description;

@@ -33,6 +33,7 @@ public class UnitUpdateRequest {
     @DecimalMin(value = "0.0", inclusive = false, message = "Base cost must be positive")
     private BigDecimal baseCost;
 
+    @NotNull
     @DecimalMin(value = "0.0", inclusive = false, message = "Final cost must be positive")
     private BigDecimal finalCost;
 

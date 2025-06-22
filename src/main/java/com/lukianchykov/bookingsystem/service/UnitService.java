@@ -148,10 +148,6 @@ public class UnitService {
     }
 
     private BigDecimal calculateFinalCost(BigDecimal baseCost) {
-        if (baseCost == null) {
-            return null;
-        }
-
         BigDecimal markup = baseCost.multiply(MARKUP_PERCENTAGE);
         BigDecimal finalCost = baseCost.add(markup);
 
