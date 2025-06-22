@@ -5,6 +5,7 @@
 - <b> Mapstruct</b>
 - <b> Pagination</b>
 - <b> Swagger</b>
+- <b> Redis</b>
 - <b> PostgreSQL</b>
 - <b> Liquibase</b>
 - <b> Docker</b>
