@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,13 +47,6 @@ public class StatsController {
     @Operation(summary = "Get number of available units for booking (cached)")
     public ResponseEntity<Long> getAvailableUnitsCount() {
         Long count = cacheService.getAvailableUnitsCount();
-        return ResponseEntity.ok(count);
-    }
-
-    @PostMapping("/refresh-cache")
-    @Operation(summary = "Manually refresh the available units cache")
-    public ResponseEntity<Long> refreshCache() {
-        Long count = cacheService.refreshAvailableUnitsCount();
         return ResponseEntity.ok(count);
     }
 

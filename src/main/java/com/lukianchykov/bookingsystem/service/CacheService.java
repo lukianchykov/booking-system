@@ -33,12 +33,6 @@ public class CacheService {
         evictAvailableUnitsCache();
     }
 
-    public Long refreshAvailableUnitsCount() {
-        log.info("Refreshing available units cache");
-        evictAvailableUnitsCache();
-        return getAvailableUnitsCount();
-    }
-
     public boolean isCacheHealthy() {
         try {
             getAvailableUnitsCount();
