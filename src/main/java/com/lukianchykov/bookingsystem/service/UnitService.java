@@ -1,5 +1,8 @@
 package com.lukianchykov.bookingsystem.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import com.lukianchykov.bookingsystem.controller.exception.UnitNotFoundException;
 import com.lukianchykov.bookingsystem.controller.exception.UserNotFoundException;
 import com.lukianchykov.bookingsystem.domain.Unit;
@@ -28,25 +31,34 @@ import org.springframework.stereotype.Service;
 @Transactional
 @Slf4j
 public class UnitService {
-    
+
+    private static final BigDecimal MARKUP_PERCENTAGE = new BigDecimal("0.15");
+
     private final UnitRepository unitRepository;
+
     private final UserRepository userRepository;
+
     private final EventService eventService;
+
     private final UnitMapper unitMapper;
+
     private final ApplicationEventPublisher eventPublisher;
-    
+
     public UnitResponse createUnit(UnitCreateRequest request) {
         User owner = userRepository.findById(request.getOwnerId())
             .orElseThrow(() -> new UserNotFoundException(request.getOwnerId()));
-        
+
+        BigDecimal finalCost = calculateFinalCost(request.getBaseCost());
+
         Unit unit = Unit.builder()
-                .numberOfRooms(request.getNumberOfRooms())
-                .accommodationType(request.getAccommodationType())
-                .floor(request.getFloor())
-                .baseCost(request.getBaseCost())
-                .description(request.getDescription())
-                .owner(owner)
-                .build();
+            .numberOfRooms(request.getNumberOfRooms())
+            .accommodationType(request.getAccommodationType())
+            .floor(request.getFloor())
+            .baseCost(request.getBaseCost())
+            .finalCost(finalCost)
+            .description(request.getDescription())
+            .owner(owner)
+            .build();
 
         unit = unitRepository.save(unit);
 
@@ -54,7 +66,7 @@ public class UnitService {
             "Unit created with " + unit.getNumberOfRooms() + " rooms");
 
         publishAvailableUnitsChangedEvent("Unit created");
-        
+
         return unitMapper.toResponse(unit);
     }
 
@@ -67,21 +79,21 @@ public class UnitService {
     public Page<UnitResponse> searchUnits(UnitSearchRequest request) {
         Sort sort = Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
-        
-        String accommodationType = request.getAccommodationType() != null ? 
-                request.getAccommodationType().name() : null;
-        
+
+        String accommodationType = request.getAccommodationType() != null ?
+            request.getAccommodationType().name() : null;
+
         Page<Unit> units = unitRepository.findAvailableUnits(
-                request.getNumberOfRooms(),
-                accommodationType,
-                request.getFloor(),
-                request.getMinCost(),
-                request.getMaxCost(),
-                request.getStartDate(),
-                request.getEndDate(),
-                pageable
+            request.getNumberOfRooms(),
+            accommodationType,
+            request.getFloor(),
+            request.getMinCost(),
+            request.getMaxCost(),
+            request.getStartDate(),
+            request.getEndDate(),
+            pageable
         );
-        
+
         return units.map(unitMapper::toResponse);
     }
 
@@ -92,11 +104,14 @@ public class UnitService {
         User owner = userRepository.findById(request.getOwnerId())
             .orElseThrow(() -> new UserNotFoundException(request.getOwnerId()));
 
+        BigDecimal finalCost = request.getFinalCost() != null ?
+            request.getFinalCost() : calculateFinalCost(request.getBaseCost());
+
         unit.setNumberOfRooms(request.getNumberOfRooms());
         unit.setAccommodationType(request.getAccommodationType());
         unit.setFloor(request.getFloor());
         unit.setBaseCost(request.getBaseCost());
-        unit.setFinalCost(request.getFinalCost());
+        unit.setFinalCost(finalCost);
         unit.setDescription(request.getDescription());
         unit.setOwner(owner);
 
@@ -130,6 +145,17 @@ public class UnitService {
     public Long countTotalUnits() {
         log.debug("Querying database for total units count");
         return unitRepository.count();
+    }
+
+    private BigDecimal calculateFinalCost(BigDecimal baseCost) {
+        if (baseCost == null) {
+            return null;
+        }
+
+        BigDecimal markup = baseCost.multiply(MARKUP_PERCENTAGE);
+        BigDecimal finalCost = baseCost.add(markup);
+
+        return finalCost.setScale(2, RoundingMode.HALF_UP);
     }
 
     private void publishAvailableUnitsChangedEvent(String reason) {
