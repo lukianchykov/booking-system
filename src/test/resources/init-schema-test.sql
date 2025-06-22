@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS bookings;
-DROP TABLE IF EXISTS units;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS units CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users
 (
@@ -20,8 +20,7 @@ CREATE TABLE units
     final_cost         DECIMAL(10, 2),
     description        TEXT           NOT NULL,
     owner_id           BIGINT         NOT NULL,
-    created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (owner_id) REFERENCES users (id)
+    created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE bookings
@@ -34,7 +33,5 @@ CREATE TABLE bookings
     total_cost DECIMAL(10, 2),
     status     VARCHAR(20)    NOT NULL CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'EXPIRED')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP,
-    FOREIGN KEY (unit_id) REFERENCES units (id),
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    expires_at TIMESTAMP
 );

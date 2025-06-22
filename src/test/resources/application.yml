@@ -24,12 +24,6 @@ spring:
       enabled: true
       path: /h2-console
 
-  data:
-    redis:
-      host: localhost
-      port: 6380
-      timeout: 1000ms
-
   cache:
     type: simple
 

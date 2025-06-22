@@ -3,7 +3,6 @@ package com.lukianchykov.bookingsystem.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,6 +55,9 @@ class UnitServiceTest {
 
     @Mock
     private UnitMapper unitMapper;
+
+    @Mock
+    private EventService eventService;
 
     @InjectMocks
     private UnitService unitService;
@@ -141,7 +143,7 @@ class UnitServiceTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> unitService.createUnit(testCreateRequest));
-        assertEquals("Owner not found", exception.getMessage());
+        assertEquals("User not found with ID: 1", exception.getMessage());
 
         verify(unitRepository, never()).save(any());
         verify(cacheService, never()).evictAvailableUnitsCache();
@@ -255,7 +257,7 @@ class UnitServiceTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> unitService.getUnit(1L));
-        assertEquals("Unit not found", exception.getMessage());
+        assertEquals("Unit not found with ID: 1", exception.getMessage());
     }
 
     @Test

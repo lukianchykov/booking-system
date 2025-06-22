@@ -181,7 +181,7 @@ class BookingSystemIT {
 
         assertThatThrownBy(() -> unitService.createUnit(request))
             .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("Owner not found");
+            .hasMessageContaining("User not found with ID: 999");
     }
 
     @Test
@@ -277,7 +277,7 @@ class BookingSystemIT {
 
         assertThatThrownBy(() -> bookingService.createBooking(conflictingRequest))
             .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("Unit is not available for selected dates");
+            .hasMessageContaining("Unit is not available for the selected dates");
     }
 
     @Test

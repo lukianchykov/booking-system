@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -24,12 +24,7 @@ public class CacheConfig {
     @Bean
     @ConditionalOnProperty(name = "cache.type", havingValue = "redis", matchIfMissing = true)
     public RedisConnectionFactory redisConnectionFactory() {
-        JedisConnectionFactory factory = new JedisConnectionFactory();
-        factory.setHostName("localhost");
-        factory.setPort(6379);
-        factory.setTimeout(2000);
-        factory.setUsePool(true);
-        return factory;
+        return new LettuceConnectionFactory("localhost", 6379);
     }
 
     @Bean
@@ -50,12 +45,12 @@ public class CacheConfig {
     @ConditionalOnProperty(name = "cache.type", havingValue = "redis", matchIfMissing = true)
     public CacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(5))
-                .disableCachingNullValues();
-                
+            .entryTtl(Duration.ofMinutes(5))
+            .disableCachingNullValues();
+
         return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(config)
-                .build();
+            .cacheDefaults(config)
+            .build();
     }
 
     @Bean

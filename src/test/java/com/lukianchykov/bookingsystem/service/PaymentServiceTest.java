@@ -110,7 +110,7 @@ class PaymentServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class, 
                 () -> paymentService.processPayment(paymentRequest));
         
-        assertEquals("Booking not found", exception.getMessage());
+        assertEquals("Booking not found with ID: 1", exception.getMessage());
         
         verify(paymentRepository, never()).save(any(Payment.class));
         verify(bookingRepository, never()).save(any(Booking.class));

@@ -54,6 +54,10 @@ class BookingServiceTest {
     @Mock
     private BookingMapper bookingMapper;
 
+    @Mock
+    private EventService eventService;
+
+
     @InjectMocks
     private BookingService bookingService;
 
@@ -82,6 +86,7 @@ class BookingServiceTest {
             .accommodationType(AccommodationType.APARTMENTS)
             .floor(3)
             .baseCost(BigDecimal.valueOf(100))
+            .finalCost(BigDecimal.valueOf(100))
             .description("Test unit")
             .owner(testUser)
             .createdAt(LocalDateTime.now())
@@ -147,7 +152,7 @@ class BookingServiceTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> bookingService.createBooking(testRequest));
-        assertEquals("Unit not found", exception.getMessage());
+        assertEquals("Unit not found with ID: 1", exception.getMessage());
 
         verify(bookingRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());
@@ -161,7 +166,7 @@ class BookingServiceTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> bookingService.createBooking(testRequest));
-        assertEquals("User not found", exception.getMessage());
+        assertEquals("User not found with ID: 1", exception.getMessage());
 
         verify(bookingRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());
@@ -177,7 +182,7 @@ class BookingServiceTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> bookingService.createBooking(testRequest));
-        assertEquals("Unit is not available for selected dates", exception.getMessage());
+        assertEquals("Unit is not available for the selected dates", exception.getMessage());
 
         verify(bookingRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());
@@ -226,7 +231,7 @@ class BookingServiceTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> bookingService.cancelBooking(1L));
-        assertEquals("Booking not found", exception.getMessage());
+        assertEquals("Booking not found with ID: 1", exception.getMessage());
 
         verify(bookingRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());

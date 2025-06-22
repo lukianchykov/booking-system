@@ -29,6 +29,9 @@ class UserServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private EventService eventService;
+
     @InjectMocks
     private UserService userService;
 
@@ -91,6 +94,6 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.getUser(1L))
             .isInstanceOf(RuntimeException.class)
-            .hasMessage("User not found");
+            .hasMessage("User not found with ID: 1");
     }
 }

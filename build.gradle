@@ -19,6 +19,13 @@ configurations {
 	}
 }
 
+configurations.all {
+	resolutionStrategy {
+		force 'redis.clients:jedis:4.3.1'
+	}
+}
+
+
 repositories {
 	mavenCentral()
 }
@@ -38,7 +45,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'redis.clients:jedis:5.1.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	runtimeOnly 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
