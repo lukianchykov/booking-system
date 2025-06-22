@@ -167,7 +167,7 @@ class UnitServiceTest {
 
         Page<Unit> mockPage = new PageImpl<>(Collections.singletonList(testUnit));
         when(unitRepository.findAvailableUnits(
-            eq(2), AccommodationType.valueOf(eq("APARTMENTS")), eq(3),
+            eq(2), eq(AccommodationType.valueOf("APARTMENTS")), eq(3),
             eq(BigDecimal.valueOf(50)), eq(BigDecimal.valueOf(150)),
             any(LocalDate.class), any(LocalDate.class), any(Pageable.class)))
             .thenReturn(mockPage);
