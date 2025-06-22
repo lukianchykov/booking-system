@@ -80,12 +80,9 @@ public class UnitService {
         Sort sort = Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
 
-        String accommodationType = request.getAccommodationType() != null ?
-            request.getAccommodationType().name() : null;
-
         Page<Unit> units = unitRepository.findAvailableUnits(
             request.getNumberOfRooms(),
-            accommodationType,
+            request.getAccommodationType(),
             request.getFloor(),
             request.getMinCost(),
             request.getMaxCost(),
