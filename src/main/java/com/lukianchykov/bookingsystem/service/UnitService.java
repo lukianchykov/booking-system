@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 
 import com.lukianchykov.bookingsystem.controller.exception.UnitNotFoundException;
 import com.lukianchykov.bookingsystem.controller.exception.UserNotFoundException;
-import com.lukianchykov.bookingsystem.domain.AccommodationType;
 import com.lukianchykov.bookingsystem.domain.Unit;
 import com.lukianchykov.bookingsystem.domain.User;
 import com.lukianchykov.bookingsystem.dto.UnitCreateRequest;
@@ -80,11 +79,13 @@ public class UnitService {
     public Page<UnitResponse> searchUnits(UnitSearchRequest request) {
         Sort sort = Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
-        AccommodationType type = request.getAccommodationType();
+
+        String accommodationType = request.getAccommodationType() != null ?
+            request.getAccommodationType().name() : null;
 
         Page<Unit> units = unitRepository.findAvailableUnits(
             request.getNumberOfRooms(),
-            type,
+            accommodationType,
             request.getFloor(),
             request.getMinCost(),
             request.getMaxCost(),
