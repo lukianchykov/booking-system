@@ -27,10 +27,8 @@ public class DataInitializationService implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        if (unitRepository.count() == 0) {
-            log.info("Initializing data with 90 random units...");
-            initializeRandomUnits();
-        }
+        log.info("Initializing data with 90 random units");
+        initializeRandomUnits();
     }
 
     private void initializeRandomUnits() {
